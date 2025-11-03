@@ -1,0 +1,3 @@
+portainer_data_dir: /home/{{ ansible_user }}/portainer_data
+portainer_stack_path: /home/{{ ansible_user }}/portainer_stack.yml
+portainer_workdir: /home/{{ ansible_user }}

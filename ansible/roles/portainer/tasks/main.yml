@@ -1,0 +1,30 @@
+- name: Garantir que o Docker está disponível
+  ansible.builtin.command: docker info
+  register: docker_status
+  failed_when: docker_status.rc != 0
+  changed_when: false
+
+- name: Garantir diretório de dados do Portainer
+  ansible.builtin.file:
+    path: "{{ portainer_data_dir }}"
+    state: directory
+    owner: "{{ ansible_user | default('kepler') }}"
+    mode: '0755'
+
+- name: Copiar stack do Portainer para o host remoto
+  ansible.builtin.copy:
+    src: service.yml
+    dest: "{{ portainer_stack_path }}"
+    owner: "{{ ansible_user | default('kepler') }}"
+    mode: '0644'
+
+- name: Implantar stack do Portainer
+  ansible.builtin.command:
+    cmd: docker stack deploy -c "{{ portainer_stack_path }}" portainer
+  args:
+    chdir: "{{ portainer_workdir }}"
+  register: deploy_result
+
+- name: Exibir resultado do deploy
+  ansible.builtin.debug:
+    var: deploy_result.stdout_lines

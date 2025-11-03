@@ -1,0 +1,5 @@
+- name: Deploy de Serviços Docker
+  hosts: masters
+  become: yes
+  roles:
+    - portainer
