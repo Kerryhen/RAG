@@ -1,0 +1,40 @@
+services:
+  lightrag:
+    image: ghcr.io/hkuds/lightrag:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - ghcr.io/hkuds/lightrag:latest
+    ports:
+      - "${PORT:-9621}:9621"
+    volumes:
+      - ./ligthrag_data/rag_storage:/app/data/rag_storage
+      - ./ligthrag_data/inputs:/app/data/inputs
+      - ./config.ini:/app/config.ini
+      - ./.env:/app/.env
+    env_file:
+      - .env
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgrees:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lightrag_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lightrag_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-lightrag_db}
+    volumes:
+      - ./ligthrag_data/postgree:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    restart: unless-stopped
+
+volumes:
+  ligthrag_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/vagrant/ligthrag_data

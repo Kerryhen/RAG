@@ -1,0 +1,41 @@
+- name: Garantir que o Docker está disponível
+  ansible.builtin.command: docker info
+  register: docker_status
+  failed_when: docker_status.rc != 0
+  changed_when: false
+
+- name: Garantir diretório de dados do ligthrag
+  ansible.builtin.file:
+    path: "{{ ligthrag_data_dir }}"
+    state: directory
+    owner: "{{ ansible_user | default('kepler') }}"
+    mode: '0755'
+
+- name: Copiar stack e arquivos do ligthrag para o host remoto
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ ansible_user | default('kepler') }}"
+    mode: '0644'
+  loop:
+    - { src: 'service.yml', dest: '{{ ligthrag_stack_path }}' }
+    - { src: 'config.ini', dest: '{{ ligthrag_workdir }}/config.ini' }
+    - { src: '.env', dest: '{{ ligthrag_workdir }}/.env' }
+
+
+- name: Garantir que o pip está instalado no host
+  ansible.builtin.package:
+    name: python3-pip
+    state: present
+
+- name: Garantir que o jsondiff está instalado (dependência do módulo docker_stack)
+  ansible.builtin.pip:
+    name: jsondiff
+    state: present
+
+- name: Implantar stack do ligthrag
+  docker_stack:
+    state: present
+    name: ligthrag
+    compose:
+      - '{{ ligthrag_stack_path }}'

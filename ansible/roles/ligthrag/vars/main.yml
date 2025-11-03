@@ -1,0 +1,3 @@
+ligthrag_data_dir: /home/vagrant/ligthrag_data
+ligthrag_stack_path: /home/vagrant/ligthrag_stack.yml
+ligthrag_workdir: /home/vagrant
