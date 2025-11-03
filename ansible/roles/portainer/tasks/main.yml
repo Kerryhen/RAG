@@ -18,13 +18,19 @@
     owner: "{{ ansible_user | default('kepler') }}"
     mode: '0644'
 
-- name: Implantar stack do Portainer
-  ansible.builtin.command:
-    cmd: docker stack deploy -c "{{ portainer_stack_path }}" portainer
-  args:
-    chdir: "{{ portainer_workdir }}"
-  register: deploy_result
+- name: Garantir que o pip está instalado no host
+  ansible.builtin.package:
+    name: python3-pip
+    state: present
 
-- name: Exibir resultado do deploy
-  ansible.builtin.debug:
-    var: deploy_result.stdout_lines
+- name: Garantir que o jsondiff está instalado (dependência do módulo docker_stack)
+  ansible.builtin.pip:
+    name: jsondiff
+    state: present
+
+- name: Implantar stack do Portainer
+  docker_stack:
+    state: present
+    name: portainer
+    compose:
+      - '{{ portainer_stack_path }}'

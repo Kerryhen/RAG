@@ -1,0 +1,31 @@
+[project]
+name = "RAG"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Henrycke Bozza Schenberk", email = "0Kerryhen@pm.me"},
+]
+dependencies = ["ansible>=12.1.0", "commitizen>=4.9.1", "taskipy>=1.14.1"]
+requires-python = "==3.13.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
+
+[tool.taskipy.tasks]
+deploy_ansible = 'cd ansible && ansible-playbook deploy.yml'
+deploy_vm = 'cd vagrant && vagrant up'
+destroy_vm = 'cd vagrant && vagrant destroy -f'
+generate_keys = " [ ! -f $(pwd)/vagrant/keys/id_rsa ] && ssh-keygen -q -t rsa -f $(pwd)/vagrant/keys/id_rsa -N ''"
+setup = "task generate_keys & task deploy_vm && task deploy_ansible"
+commit = "cz c"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "pep440"
+version_provider = "pep621"
+update_changelog_on_bump = true
+major_version_zero = true

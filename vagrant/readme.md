@@ -1,0 +1,1 @@
+ssh-keygen -q -t ed25519 -f ./keys/id_25519 -N ''
