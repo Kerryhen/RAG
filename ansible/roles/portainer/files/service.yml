@@ -20,6 +20,12 @@ services:
       - "9443:9443"
       - "9000:9000"
       - "8000:8000"
+    
+    # #user and password can be set using environment variables or via the web
+    # environment:
+    #   - ADMIN_PASSWORD=admin12345
+    #   - ADMIN_USERNAME=admin
+      
     volumes:
       - portainer_data:/data
     networks:
